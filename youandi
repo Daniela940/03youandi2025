@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>new</title>
+<style>
+body {
+  margin:0;
+  padding:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background: linear-gradient(135deg, #fbc2eb 0%, #f38ec6 40%, #a18cd1 100%);
+  font-family: Arial, sans-serif;
+  overflow:hidden;
+  perspective:1000px;
+}
+
+#slide-container {
+  position:relative;
+  width:85vw;
+  max-width:900px;
+  height:70vh;
+  overflow:hidden;
+  z-index:1;
+}
+
+.slide {
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  transform: translateX(0) rotate(0deg);
+  transition: all 1s ease;
+}
+
+.slide img {
+  max-width:75%;
+  max-height:55%;
+  border-radius:8px;
+  border:4px solid #fff;
+  box-shadow:0 6px 16px rgba(0,0,0,0.2);
+}
+
+.note {
+  margin-top:8px;
+  background:#fff8dc;
+  padding:8px 12px;
+  border-radius:6px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.2);
+  transform:rotate(-2deg);
+  font-size:1.2em;
+  text-align:center;
+}
+
+/* Confetti */
+#confetti-layer {
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  pointer-events:none;
+  z-index:50;
+}
+.confetti {
+  position:absolute;
+  top:-20px;
+  width:5px; height:5px;
+  border-radius:2px;
+  opacity:0.9;
+  animation: fall linear infinite;
+}
+@keyframes fall {
+  from {transform: translateY(0) rotate(0deg);}
+  to {transform: translateY(120vh) rotate(360deg);}
+}
+
+/* Final */
+#final-layer {
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:100;
+}
+.balloon {
+  position:fixed;
+  bottom:-120px;
+  border-radius:50%;
+  box-shadow: inset -10px -15px 25px rgba(0,0,0,0.2);
+  z-index:101;
+}
+.balloon::before {
+  content:"";
+  position:absolute;
+  top:15%;
+  left:20%;
+  width:25%;
+  height:35%;
+  background: rgba(255,255,255,0.6);
+  border-radius:50%;
+  transform: rotate(-20deg);
+}
+.balloon::after {
+  content:"";
+  position:absolute;
+  top:100%;
+  left:50%;
+  transform: translateX(-50%) rotate(5deg);
+  width:2px;
+  height:40px;
+  background:#555;
+  border-radius:1px;
+}
+.star {
+  position:fixed;
+  width:10px;
+  height:10px;
+  background: gold;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  opacity:0.9;
+  animation: fall-star linear infinite;
+  z-index:101;
+}
+@keyframes fall-star {
+  from {transform: translateY(0) rotate(0deg);}
+  to {transform: translateY(120vh) rotate(720deg);}
+}
+
+/* 📱 Responsivitate */
+@media (max-width: 600px) {
+  #slide-container {
+    width:95vw;
+    height:65vh;
+  }
+  .slide img {
+    max-width:85%;
+    max-height:50%;
+  }
+  .note {
+    font-size:1em;
+    padding:6px 10px;
+  }
+  .balloon {
+    width:40px !important;
+    height:55px !important;
+  }
+  .confetti {
+    width:3px;
+    height:3px;
+  }
+  .star {
+    width:6px;
+    height:6px;
+  }
+}
+</style>
+</head>
+<body>
+
+<audio id="bg-audio" autoplay loop>
+  <source src="muzica.mp3" type="audio/mpeg">
+</audio>
+
+<div id="slide-container"></div>
+<div id="confetti-layer"></div>
+<div id="final-layer"></div>
+
+<script>
+// --- Slide-uri ---
+const slidesData = [
+  {img:"poza1.jpg", note:"La mulți ani, prietena mea dragă! 🎉"},
+  {img:"poza2.jpg", note:"Îți mulțumesc că ești în viața mea ❤️"},
+  {img:"poza3.jpg", note:"Amintiri frumoase și multe zâmbete 💫"},
+  {img:"poza4.jpg", note:"Împreună mereu mai puternice 🌸"}
+];
+const container = document.getElementById('slide-container');
+slidesData.forEach(data => {
+  const slide = document.createElement('div');
+  slide.className = 'slide';
+  const img = document.createElement('img');
+  img.src = data.img;
+  const note = document.createElement('div');
+  note.className='note';
+  note.textContent = data.note;
+  slide.appendChild(img);
+  slide.appendChild(note);
+  container.appendChild(slide);
+});
+
+// --- Animatie slide-uri ---
+const slides = document.querySelectorAll('.slide');
+let current = 0;
+function showNextSlide(){
+  if(current>0) slides[current-1].style.opacity=0;
+  if(current<slides.length){
+    const s = slides[current];
+    const randX = (Math.random()*40 - 20);
+    const fromLeft = Math.random()<0.5 ? -100 : 100;
+    s.style.transform=`translateX(${fromLeft}px) rotate(${randX}deg)`;
+    setTimeout(()=>{ s.style.opacity=1; s.style.transform=`translateX(0px) rotate(0deg)` }, 50);
+    current++;
+    setTimeout(showNextSlide, 2000);
+  } else {
+    showFinal();
+  }
+}
+
+// --- Confetti ---
+for(let i=0;i<60;i++){
+  const c=document.createElement('div');
+  c.className='confetti';
+  c.style.left=Math.random()*100+'%';
+  c.style.background=`hsl(${Math.random()*360},80%,60%)`;
+  const size=3+Math.random()*4;
+  c.style.width=size+'px';
+  c.style.height=size+'px';
+  c.style.animationDuration=(4+Math.random()*5)+'s';
+  c.style.animationDelay=Math.random()*5+'s';
+  document.getElementById('confetti-layer').appendChild(c);
+}
+
+// --- Baloane + Stele ---
+// animatie baloane
+const style = document.createElement('style');
+style.textContent = `
+@keyframes rise {
+  0%   { transform: translateY(0); opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(-120vh); opacity: 0; }
+}`;
+document.head.appendChild(style);
+
+function createBalloon() {
+  const b = document.createElement('div');
+  b.className = 'balloon';
+  b.style.left = (5 + Math.random() * 90) + '%';
+  const hue = Math.floor(Math.random() * 360);
+  b.style.background = `radial-gradient(circle at 30% 30%, 
+                        hsl(${hue},80%,70%), hsl(${hue},80%,45%))`;
+  const size = 40 + Math.random() * 50;
+  b.style.width = size + 'px';
+  b.style.height = (size * 1.3) + 'px';
+  b.style.animation = `rise ${6 + Math.random() * 5}s linear forwards`;
+  b.addEventListener('animationend', () => b.remove());
+  document.getElementById('final-layer').appendChild(b);
+}
+
+function createStar() {
+  const s = document.createElement('div');
+  s.className = 'star';
+  s.style.left = Math.random() * 100 + '%';
+  s.style.animationDuration = (4 + Math.random() * 5) + 's';
+  s.style.animationDelay = Math.random() * 5 + 's';
+  s.addEventListener('animationend', () => s.remove());
+  document.getElementById('final-layer').appendChild(s);
+}
+
+function showFinal(){
+  // primul val de baloane
+  for(let i=0;i<20;i++){
+    setTimeout(createBalloon, i * 300);
+  }
+  // continuu
+  for(let i=0;i<20;i++){
+    setInterval(createBalloon, 2000);
+  }
+
+  // stele
+  for(let i=0;i<20;i++){
+    setTimeout(createStar, i * 200);
+  }
+  setInterval(createStar, 3000);
+}
+
+setTimeout(showNextSlide, 500);
+</script>
+
+</body>
+</html>
