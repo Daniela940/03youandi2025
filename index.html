@@ -95,6 +95,7 @@ body {
   border-radius:50%;
   box-shadow: inset -10px -15px 25px rgba(0,0,0,0.2);
   z-index:101;
+  animation: rise 10s linear forwards;
 }
 .balloon::before {
   content:"";
@@ -214,15 +215,15 @@ function showNextSlide(){
 
 // --- Confetti ---
 for(let i=0;i<60;i++){
-  const c=document.createElement('div');
-  c.className='confetti';
-  c.style.left=Math.random()*100+'%';
-  c.style.background=`hsl(${Math.random()*360},80%,60%)`;
-  const size=3+Math.random()*4;
-  c.style.width=size+'px';
-  c.style.height=size+'px';
-  c.style.animationDuration=(4+Math.random()*5)+'s';
-  c.style.animationDelay=Math.random()*5+'s';
+  const c = document.createElement('div');
+  c.className = 'confetti';
+  c.style.left = Math.random()*100+'%';
+  c.style.background = `hsl(${Math.random()*360},80%,60%)`;
+  const size = 3+Math.random()*4;
+  c.style.width = size+'px';
+  c.style.height = size+'px';
+  c.style.animationDuration = (4+Math.random()*5)+'s';
+  c.style.animationDelay = Math.random()*5+'s';
   document.getElementById('confetti-layer').appendChild(c);
 }
 
@@ -237,7 +238,8 @@ style.textContent = `
 }`;
 document.head.appendChild(style);
 
-function createBalloon() {
+function createBalloon() 
+{
   const b = document.createElement('div');
   b.className = 'balloon';
   b.style.left = (5 + Math.random() * 90) + '%';
@@ -252,7 +254,8 @@ function createBalloon() {
   document.getElementById('final-layer').appendChild(b);
 }
 
-function createStar() {
+function createStar() 
+{
   const s = document.createElement('div');
   s.className = 'star';
   s.style.left = Math.random() * 100 + '%';
@@ -262,18 +265,22 @@ function createStar() {
   document.getElementById('final-layer').appendChild(s);
 }
 
-function showFinal(){
+function showFinal()
+{
   // primul val de baloane
-  for(let i=0;i<20;i++){
+  for(let i = 0; i < 15; i++)
+  {
     setTimeout(createBalloon, i * 300);
   }
   // continuu
-  for(let i=0;i<20;i++){
+  for(let i = 0; i < 15; i++)
+  {
     setInterval(createBalloon, 2000);
   }
 
   // stele
-  for(let i=0;i<20;i++){
+  for(let i=0;i<20;i++)
+  {
     setTimeout(createStar, i * 200);
   }
   setInterval(createStar, 3000);
