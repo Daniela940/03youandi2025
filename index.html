@@ -10,6 +10,7 @@ body {
   padding:0;
   height:100vh;
   display:flex;
+  flex-direction:column;
   justify-content:center;
   align-items:center;
   background: linear-gradient(135deg, #fbc2eb 0%, #f38ec6 40%, #a18cd1 100%);
@@ -59,6 +60,27 @@ body {
   transform:rotate(-2deg);
   font-size:1.2em;
   text-align:center;
+}
+
+/* Controale */
+#controls {
+  margin-top: 20px;
+  text-align: center;
+  z-index: 200;
+  position: relative;
+}
+#controls button {
+  background: #fff;
+  border: 2px solid #555;
+  border-radius: 6px;
+  padding: 8px 14px;
+  margin: 0 5px;
+  font-size: 1em;
+  cursor: pointer;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+#controls button:hover {
+  background: #f0f0f0;
 }
 
 /* Confetti */
@@ -170,6 +192,11 @@ body {
 </audio>
 
 <div id="slide-container"></div>
+<div id="controls">
+  <button id="prevBtn">⏮️ Înapoi</button>
+  <button id="playPauseBtn">⏸️ Pauză</button>
+  <button id="nextBtn">⏭️ Înainte</button>
+</div>
 <div id="confetti-layer"></div>
 <div id="final-layer"></div>
 
@@ -177,12 +204,12 @@ body {
 // --- Slide-uri ---
 const slidesData = [
   {img:"1.jpg", note:"La mulți ani, prietena mea dragă! 🎉"},
-  {img:"2.JPG", note:"Îți mulțumesc că ești în viața mea ❤️"},
+  {img:"2.jpg", note:"Îți mulțumesc că ești în viața mea ❤️"},
   {img:"3.jpg", note:"Amintiri frumoase și multe zâmbete 💫"},
   {img:"4.jpg", note:"Împreună mereu mai puternice 🌸"},
-  {img:"5.JPG", note:"La mulți ani, prietena mea dragă! 🎉"},
-  {img:"6.JPG", note:"Îți mulțumesc că ești în viața mea ❤️"},
-  {img:"7.JPG", note:"Amintiri frumoase și multe zâmbete 💫"},
+  {img:"5.jpg", note:"La mulți ani, prietena mea dragă! 🎉"},
+  {img:"6.jpg", note:"Îți mulțumesc că ești în viața mea ❤️"},
+  {img:"7.jpg", note:"Amintiri frumoase și multe zâmbete 💫"},
   {img:"8.jpg", note:"Împreună mereu mai puternice 🌸"},
   {img:"9.jpg", note:"La mulți ani, prietena mea dragă! 🎉"},
   {img:"10.jpg", note:"Îți mulțumesc că ești în viața mea ❤️"},
@@ -223,20 +250,53 @@ slidesData.forEach(data => {
 // --- Animatie slide-uri ---
 const slides = document.querySelectorAll('.slide');
 let current = 0;
-function showNextSlide(){
-  if(current>0) slides[current-1].style.opacity=0;
-  if(current<slides.length){
-    const s = slides[current];
-    const randX = (Math.random()*40 - 20);
-    const fromLeft = Math.random()<0.5 ? -100 : 100;
-    s.style.transform=`translateX(${fromLeft}px) rotate(${randX}deg)`;
-    setTimeout(()=>{ s.style.opacity=1; s.style.transform=`translateX(0px) rotate(0deg)` }, 50);
-    current++;
-    setTimeout(showNextSlide, 2000);
+let playing = true;
+let slideTimeout;
+
+function showSlide(index) {
+  slides.forEach((s, i) => {
+    s.style.opacity = (i === index ? 1 : 0);
+    s.style.transform = "translateX(0) rotate(0deg)";
+  });
+}
+
+function showNextSlide() {
+  if (!playing) return;
+  showSlide(current);
+  current++;
+  if (current < slides.length) {
+    slideTimeout = setTimeout(showNextSlide, 2000);
   } else {
     showFinal();
   }
 }
+
+function prevSlide() {
+  clearTimeout(slideTimeout);
+  current = (current - 1 + slides.length) % slides.length;
+  showSlide(current);
+}
+
+function nextSlide() {
+  clearTimeout(slideTimeout);
+  current = (current + 1) % slides.length;
+  showSlide(current);
+}
+
+document.getElementById("playPauseBtn").addEventListener("click", () => {
+  if (playing) {
+    playing = false;
+    clearTimeout(slideTimeout);
+    document.getElementById("playPauseBtn").textContent = "▶️ Play";
+  } else {
+    playing = true;
+    document.getElementById("playPauseBtn").textContent = "⏸️ Pauză";
+    showNextSlide();
+  }
+});
+
+document.getElementById("prevBtn").addEventListener("click", prevSlide);
+document.getElementById("nextBtn").addEventListener("click", nextSlide);
 
 // --- Confetti ---
 for(let i=0;i<60;i++){
@@ -253,7 +313,6 @@ for(let i=0;i<60;i++){
 }
 
 // --- Baloane + Stele ---
-// animatie baloane
 const style = document.createElement('style');
 style.textContent = `
 @keyframes rise {
@@ -263,8 +322,7 @@ style.textContent = `
 }`;
 document.head.appendChild(style);
 
-function createBalloon() 
-{
+function createBalloon() {
   const b = document.createElement('div');
   b.className = 'balloon';
   b.style.left = (5 + Math.random() * 90) + '%';
@@ -279,8 +337,7 @@ function createBalloon()
   document.getElementById('final-layer').appendChild(b);
 }
 
-function createStar() 
-{
+function createStar() {
   const s = document.createElement('div');
   s.className = 'star';
   s.style.left = Math.random() * 100 + '%';
@@ -290,28 +347,20 @@ function createStar()
   document.getElementById('final-layer').appendChild(s);
 }
 
-function showFinal()
-{
-  // primul val de baloane
-  for(let i = 0; i < 15; i++)
-  {
+function showFinal() {
+  for(let i = 0; i < 15; i++) {
     setTimeout(createBalloon, i * 300);
   }
-  // continuu
-  for(let i = 0; i < 15; i++)
-  {
+  for(let i = 0; i < 15; i++) {
     setInterval(createBalloon, 2000);
   }
-
-  // stele
-  for(let i=0;i<20;i++)
-  {
+  for(let i=0;i<20;i++) {
     setTimeout(createStar, i * 200);
   }
   setInterval(createStar, 3000);
 }
 
-setTimeout(showNextSlide, 500);
+setTimeout(showNextSlide, 1000);
 </script>
 
 </body>
