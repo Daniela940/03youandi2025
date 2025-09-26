@@ -2,122 +2,96 @@
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>new</title>
+<title>Surpriză 🎁</title>
 <style>
 body {
   margin:0;
-  padding:0;
   height:100vh;
+  font-family: Arial, sans-serif;
+  overflow:hidden;
   display:flex;
-  flex-direction:column;
   justify-content:center;
   align-items:center;
   background: linear-gradient(135deg, #fbc2eb 0%, #f38ec6 40%, #a18cd1 100%);
-  font-family: Arial, sans-serif;
-  overflow:hidden;
-  perspective:1000px;
 }
 
-#slide-container {
-  position:relative;
-  width:85vw;
-  max-width:900px;
-  height:70vh;
-  overflow:hidden;
-  z-index:1;
-}
-
-.slide {
-  position:absolute;
-  top:0;
-  left:0;
+/* container prezentare */
+#show {
   width:100%;
   height:100%;
+  position: relative;
+  overflow:hidden;
+  z-index:5;
+}
+
+/* slide-uri */
+.slide {
+  position:absolute;
+  top:0; left:0; right:0; bottom:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  opacity:0;
+  transition: opacity 1s;
+}
+.slide.active { opacity:1; }
+
+/* poze */
+.slide img {
+  max-width:80%;
+  max-height:70%;
+  border-radius:12px;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+  opacity:0;
+  transform:translateX(0) rotate(0);
+  transition: all 1.2s ease;
+}
+.slide.left img { transform: translateX(-80px) rotate(-8deg); }
+.slide.left.active img { opacity:1; transform: translateX(0) rotate(-3deg); }
+.slide.right img { transform: translateX(80px) rotate(8deg); }
+.slide.right.active img { opacity:1; transform: translateX(0) rotate(3deg); }
+
+/* bilețele */
+.note {
+  position:absolute;
+  background:#fff8dc;
+  padding:12px 18px;
+  border-radius:8px;
+  box-shadow:0 6px 12px rgba(0,0,0,.2);
+  opacity:0;
+  transform:scale(0.8) rotate(0);
+  animation: appear 0.8s forwards;
+}
+@keyframes appear {
+  to { opacity:1; transform:scale(1) rotate(var(--rot)); }
+}
+
+/* slide final */
+.final-wrap {
   display:flex;
   flex-direction:column;
   align-items:center;
-  justify-content:center;
-  opacity:0;
-  transform: translateX(0) rotate(0deg);
-  transition: all 1s ease;
+  gap:20px;
+  position:relative;
+  z-index:10;
 }
-
-.slide img {
-  max-width:75%;
-  max-height:55%;
-  border-radius:8px;
-  border:4px solid #fff;
-  box-shadow:0 6px 16px rgba(0,0,0,0.2);
-}
-
-.note {
-  margin-top:8px;
-  background:#fff8dc;
-  padding:8px 12px;
-  border-radius:6px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.2);
-  transform:rotate(-2deg);
-  font-size:1.2em;
+.final-text {
+  font-size:1.8em;
+  color:#333;
   text-align:center;
+  background:rgba(255,255,255,0.8);
+  padding:10px 20px;
+  border-radius:10px;
 }
 
-/* Controale */
-#controls {
-  margin-top: 20px;
-  text-align: center;
-  z-index: 200;
-  position: relative;
-}
-#controls button {
-  background: #fff;
-  border: 2px solid #555;
-  border-radius: 6px;
-  padding: 8px 14px;
-  margin: 0 5px;
-  font-size: 1em;
-  cursor: pointer;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-}
-#controls button:hover {
-  background: #f0f0f0;
-}
-
-/* Confetti */
-#confetti-layer {
-  position:fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  pointer-events:none;
-  z-index:50;
-}
-.confetti {
-  position:absolute;
-  top:-20px;
-  width:5px; height:5px;
-  border-radius:2px;
-  opacity:0.9;
-  animation: fall linear infinite;
-}
-@keyframes fall {
-  from {transform: translateY(0) rotate(0deg);}
-  to {transform: translateY(120vh) rotate(360deg);}
-}
-
-/* Final */
-#final-layer {
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:100;
-}
+/* baloane 3D */
 .balloon {
-  position:fixed;
+  position:absolute;
   bottom:-120px;
   border-radius:50%;
+  opacity:0.95;
   box-shadow: inset -10px -15px 25px rgba(0,0,0,0.2);
-  z-index:101;
-  animation: rise 10s linear forwards;
+  animation: floatUp 8s linear infinite;
 }
 .balloon::before {
   content:"";
@@ -130,6 +104,7 @@ body {
   border-radius:50%;
   transform: rotate(-20deg);
 }
+/* sfoară subțire și ondulată discret */
 .balloon::after {
   content:"";
   position:absolute;
@@ -137,231 +112,229 @@ body {
   left:50%;
   transform: translateX(-50%) rotate(5deg);
   width:2px;
-  height:40px;
+  height:50px;
   background:#555;
   border-radius:1px;
 }
-.star {
-  position:fixed;
-  width:10px;
-  height:10px;
-  background: gold;
-  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-  opacity:0.9;
-  animation: fall-star linear infinite;
-  z-index:101;
-}
-@keyframes fall-star {
-  from {transform: translateY(0) rotate(0deg);}
-  to {transform: translateY(120vh) rotate(720deg);}
+
+@keyframes floatUp {
+  from { transform: translateY(0) scale(1); }
+  to { transform: translateY(-120vh) scale(1.05); }
 }
 
-/* 📱 Responsivitate */
-@media (max-width: 600px) {
-  #slide-container {
-    width:95vw;
-    height:65vh;
-  }
-  .slide img {
-    max-width:85%;
-    max-height:50%;
-  }
-  .note {
-    font-size:1em;
-    padding:6px 10px;
-  }
-  .balloon {
-    width:40px !important;
-    height:55px !important;
-  }
-  .confetti {
-    width:3px;
-    height:3px;
-  }
-  .star {
-    width:6px;
-    height:6px;
-  }
+/* confetti */
+#confetti-layer {
+  position:absolute;
+  top:0;left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+  z-index:20;
+}
+.confetti {
+  position:absolute;
+  top:-20px;
+  width:5px;
+  height:5px;
+  opacity:0.9;
+  border-radius:2px;
+  animation: fall linear infinite;
+}
+@keyframes fall {
+  from { transform: translateY(0) translateX(0) rotate(0deg); }
+  to { transform: translateY(120vh) translateX(30px) rotate(360deg); }
+}
+
+/* steluțe */
+.star {
+  position:absolute;
+  width:3px;
+  height:3px;
+  background:white;
+  border-radius:50%;
+  opacity:0;
+  animation: twinkle 3s infinite;
+}
+@keyframes twinkle {
+  0%,100% { opacity:0; transform:scale(0.5); }
+  50% { opacity:1; transform:scale(1.2); }
 }
 </style>
 </head>
 <body>
-
-<audio id="bg-audio" autoplay loop>
+<audio autoplay loop>
   <source src="muzica.mp3" type="audio/mpeg">
+  Browserul tău nu suportă redarea audio.
 </audio>
 
-<div id="slide-container"></div>
-<div id="controls">
-  <button id="prevBtn">⏮️ Înapoi</button>
-  <button id="playPauseBtn">⏸️ Pauză</button>
-  <button id="nextBtn">⏭️ Înainte</button>
-</div>
+<div id="show"></div>
 <div id="confetti-layer"></div>
-<div id="final-layer"></div>
 
 <script>
-// --- Slide-uri ---
-const slidesData = [
-  {img:"1.jpg", note:"La mulți ani, prietena mea dragă! 🎉"},
-  {img:"2.jpg", note:"Îți mulțumesc că ești în viața mea ❤️"},
-  {img:"3.jpg", note:"Amintiri frumoase și multe zâmbete 💫"},
-  {img:"4.jpg", note:"Împreună mereu mai puternice 🌸"},
-  {img:"5.jpg", note:"La mulți ani, prietena mea dragă! 🎉"},
-  {img:"6.jpg", note:"Îți mulțumesc că ești în viața mea ❤️"},
-  {img:"7.jpg", note:"Amintiri frumoase și multe zâmbete 💫"},
-  {img:"8.jpg", note:"Împreună mereu mai puternice 🌸"},
-  {img:"9.jpg", note:"La mulți ani, prietena mea dragă! 🎉"},
-  {img:"10.jpg", note:"Îți mulțumesc că ești în viața mea ❤️"},
-  {img:"11.jpg", note:"Amintiri frumoase și multe zâmbete 💫"},
-  {img:"12.jpg", note:"Împreună mereu mai puternice 🌸"},
-  {img:"13.jpg", note:"La mulți ani, prietena mea dragă! 🎉"},
-  {img:"14.jpg", note:"Îți mulțumesc că ești în viața mea ❤️"},
-  {img:"15.jpg", note:"Amintiri frumoase și multe zâmbete 💫"},
-  {img:"16.jpg", note:"Împreună mereu mai puternice 🌸"},
-  {img:"17.jpg", note:"La mulți ani, prietena mea dragă! 🎉"},
-  {img:"18.jpg", note:"Îți mulțumesc că ești în viața mea ❤️"},
-  {img:"19.jpg", note:"Amintiri frumoase și multe zâmbete 💫"},
-  {img:"20.jpg", note:"Împreună mereu mai puternice 🌸"},
-  {img:"21.jpg", note:"La mulți ani, prietena mea dragă! 🎉"},
-  {img:"22.jpg", note:"Îți mulțumesc că ești în viața mea ❤️"},
-  {img:"23.jpg", note:"Amintiri frumoase și multe zâmbete 💫"},
-  {img:"24.jpg", note:"Împreună mereu mai puternice 🌸"},
-  {img:"25.jpg", note:"La mulți ani, prietena mea dragă! 🎉"},
-  {img:"26.jpg", note:"Îți mulțumesc că ești în viața mea ❤️"},
-  {img:"27.jpg", note:"Amintiri frumoase și multe zâmbete 💫"},
-  {img:"28.jpg", note:"Împreună mereu mai puternice 🌸"},
-  {img:"29.jpg", note:"Îți mulțumesc că ești în viața mea ❤️"},
+const slides = [
+  { type:"text", content:[
+      "La mulți ani, prietena mea dragă! 🎉",
+      "Astăzi e ziua ta specială 💖",
+      "Să fii mereu fericită!"
+    ]},
+  { type:"image", content:"1.jpg", alt:"moment amuzant" },
+  { type:"image", content:"2.jpg", alt:"noi două" },
+  { type:"image", content:"3.jpg", alt:"noi două" },
+  { type:"image", content:"4.jpg", alt:"amintire frumoasă" },
+  { type:"image", content:"5.jpg", alt:"noi două" },
+  { type:"image", content:"6.jpg", alt:"noi două" },
+  { type:"image", content:"7.jpg", alt:"noi două" },
+  { type:"text", content:[
+      "Îți mulțumesc că ești în viața mea ❤️",
+      "Prietenia ta e un dar 🌸",
+      "Țin mult la tine!"
+    ]},
+  { type:"image", content:"8.jpg", alt:"moment amuzant" },
+  { type:"image", content:"9.jpg", alt:"noi două" },
+  { type:"image", content:"10.jpg", alt:"noi două" },
+  { type:"image", content:"11.jpg", alt:"noi două" },
+  { type:"image", content:"12.jpg", alt:"noi două" },
+  { type:"image", content:"13.jpg", alt:"noi două" },
+  { type:"image", content:"14.jpg", alt:"noi două" },
+  { type:"text", content:[
+      "Am adunat aici câteva amintiri frumoase…",
+      "Zâmbete, povești, clipe unice 💫",
+      "Și multe altele vor urma!"
+    ]},
+  { type:"image", content:"15.jpg", alt:"noi două" },
+  { type:"image", content:"16.jpg", alt:"noi două" },
+  { type:"image", content:"17.jpg", alt:"noi două" },
+  { type:"image", content:"18.jpg", alt:"noi două" },
+  { type:"image", content:"19.jpg", alt:"noi două" },
+  { type:"image", content:"20.jpg", alt:"noi două" },
+  { type:"image", content:"21.jpg", alt:"noi două" },
+  { type:"text", content:[
+      "Am adunat aici câteva amintiri frumoase…",
+      "Zâmbete, povești, clipe unice 💫",
+      "Și multe altele vor urma!"
+    ]},
+  { type:"image", content:"22.jpg", alt:"noi două" },
+  { type:"image", content:"23.jpg", alt:"noi două" },
+  { type:"image", content:"24.jpg", alt:"noi două" },
+  { type:"image", content:"25.jpg", alt:"noi două" },
+  { type:"image", content:"26.jpg", alt:"noi două" },
+  { type:"image", content:"27.jpg", alt:"noi două" },
+  { type:"image", content:"28.jpg", alt:"noi două" }, 
+  { type:"image", content:"29.jpg", alt:"noi două" }, 
+  { type:"final", content:"La mulți ani! 🎈🎊✨" }
 ];
-const container = document.getElementById('slide-container');
-slidesData.forEach(data => {
-  const slide = document.createElement('div');
-  slide.className = 'slide';
-  const img = document.createElement('img');
-  img.src = data.img;
-  const note = document.createElement('div');
-  note.className='note';
-  note.textContent = data.note;
-  slide.appendChild(img);
-  slide.appendChild(note);
-  container.appendChild(slide);
-});
 
-// --- Animatie slide-uri ---
-const slides = document.querySelectorAll('.slide');
-let current = 0;
-let playing = true;
-let slideTimeout;
+const positions = [
+  {top:"15%", left:"15%"},
+  {top:"15%", left:"65%"},
+  {top:"40%", left:"25%"},
+  {top:"40%", left:"55%"},
+  {top:"65%", left:"20%"},
+  {top:"65%", left:"60%"}
+];
 
-function showSlide(index) {
-  slides.forEach((s, i) => {
-    s.style.opacity = (i === index ? 1 : 0);
-    s.style.transform = "translateX(0) rotate(0deg)";
-  });
-}
+const root = document.getElementById('show');
+let side = "left";
 
-function showNextSlide() {
-  if (!playing) return;
-  showSlide(current);
-  current++;
-  if (current < slides.length) {
-    slideTimeout = setTimeout(showNextSlide, 2000);
+for (const s of slides){
+  const el = document.createElement('section');
+  el.className = 'slide';
+
+  if(s.type === 'image'){
+    el.classList.add(side);
+    side = side === "left" ? "right" : "left";
+    const img = document.createElement('img');
+    img.src = s.content;
+    img.alt = s.alt || '';
+    el.appendChild(img);
+
+  } else if (s.type === 'text'){
+    let available = [...positions];
+    s.content.forEach((msg, idx)=>{
+      const note = document.createElement('div');
+      note.className = 'note';
+      note.textContent = msg;
+
+      const pos = available.splice(Math.floor(Math.random()*available.length),1)[0];
+      note.style.top = pos.top;
+      note.style.left = pos.left;
+
+      const rot = (Math.random()*10 - 5) + "deg"; 
+      note.style.setProperty("--rot", rot);
+      note.style.animationDelay = (idx*1.2)+"s";
+
+      el.appendChild(note);
+    });
+
   } else {
-    showFinal();
+    const wrap = document.createElement('div');
+    wrap.className = 'final-wrap';
+
+    const msg = document.createElement('div');
+    msg.className = 'final-text';
+    msg.textContent = s.content;
+
+    wrap.appendChild(msg);
+    el.appendChild(wrap);
+
+    // baloane pe final
+    for(let i=0;i<10;i++){
+      const b = document.createElement('div');
+      b.className = 'balloon';
+      b.style.left = Math.random()*90+"%";
+
+      // culoare 3D random
+      const hue = Math.floor(Math.random()*360);
+      b.style.background = `radial-gradient(circle at 30% 30%, hsl(${hue},80%,70%), hsl(${hue},80%,45%))`;
+
+      // dimensiuni variate
+      const size = 40 + Math.random()*40; // 40px–80px
+      b.style.width = size+"px";
+      b.style.height = (size*1.3)+"px";
+
+      el.appendChild(b);
+    }
+
+    // steluțe pe final
+    for(let i=0;i<30;i++){
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.top = Math.random()*100+"%";
+      star.style.left = Math.random()*100+"%";
+      star.style.animationDelay = (Math.random()*3)+"s";
+      el.appendChild(star);
+    }
   }
+  root.appendChild(el);
 }
 
-function prevSlide() {
-  clearTimeout(slideTimeout);
-  current = (current - 1 + slides.length) % slides.length;
-  showSlide(current);
-}
-
-function nextSlide() {
-  clearTimeout(slideTimeout);
-  current = (current + 1) % slides.length;
-  showSlide(current);
-}
-
-document.getElementById("playPauseBtn").addEventListener("click", () => {
-  if (playing) {
-    playing = false;
-    clearTimeout(slideTimeout);
-    document.getElementById("playPauseBtn").textContent = "▶️ Play";
-  } else {
-    playing = true;
-    document.getElementById("playPauseBtn").textContent = "⏸️ Pauză";
-    showNextSlide();
-  }
-});
-
-document.getElementById("prevBtn").addEventListener("click", prevSlide);
-document.getElementById("nextBtn").addEventListener("click", nextSlide);
-
-// --- Confetti ---
-for(let i=0;i<60;i++){
+// confetti global
+const confettiLayer = document.getElementById('confetti-layer');
+for(let i=0;i<40;i++){  // mai mic, mai rar
   const c = document.createElement('div');
   c.className = 'confetti';
-  c.style.left = Math.random()*100+'%';
+  c.style.left = Math.random()*100+"%";
   c.style.background = `hsl(${Math.random()*360},80%,60%)`;
-  const size = 3+Math.random()*4;
-  c.style.width = size+'px';
-  c.style.height = size+'px';
-  c.style.animationDuration = (4+Math.random()*5)+'s';
-  c.style.animationDelay = Math.random()*5+'s';
-  document.getElementById('confetti-layer').appendChild(c);
+  c.style.width = (3+Math.random()*3)+"px";
+  c.style.height = c.style.width;
+  c.style.animationDuration = (3+Math.random()*6)+"s";
+  c.style.animationDelay = (Math.random()*5)+"s";
+  confettiLayer.appendChild(c);
 }
 
-// --- Baloane + Stele ---
-const style = document.createElement('style');
-style.textContent = `
-@keyframes rise {
-  0%   { transform: translateY(0); opacity: 1; }
-  90%  { opacity: 1; }
-  100% { transform: translateY(-120vh); opacity: 0; }
-}`;
-document.head.appendChild(style);
+// slideshow automat
+const nodes = [...document.querySelectorAll('.slide')];
+let i = 0;
+nodes[0].classList.add('active');
 
-function createBalloon() {
-  const b = document.createElement('div');
-  b.className = 'balloon';
-  b.style.left = (5 + Math.random() * 90) + '%';
-  const hue = Math.floor(Math.random() * 360);
-  b.style.background = `radial-gradient(circle at 30% 30%, 
-                        hsl(${hue},80%,70%), hsl(${hue},80%,45%))`;
-  const size = 40 + Math.random() * 50;
-  b.style.width = size + 'px';
-  b.style.height = (size * 1.3) + 'px';
-  b.style.animation = `rise ${6 + Math.random() * 5}s linear forwards`;
-  b.addEventListener('animationend', () => b.remove());
-  document.getElementById('final-layer').appendChild(b);
-}
-
-function createStar() {
-  const s = document.createElement('div');
-  s.className = 'star';
-  s.style.left = Math.random() * 100 + '%';
-  s.style.animationDuration = (4 + Math.random() * 5) + 's';
-  s.style.animationDelay = Math.random() * 5 + 's';
-  s.addEventListener('animationend', () => s.remove());
-  document.getElementById('final-layer').appendChild(s);
-}
-
-function showFinal() {
-  for(let i = 0; i < 15; i++) {
-    setTimeout(createBalloon, i * 300);
+const timer = setInterval(() => {
+  if (i >= nodes.length - 1){
+    clearInterval(timer); return;
   }
-  for(let i = 0; i < 15; i++) {
-    setInterval(createBalloon, 2000);
-  }
-  for(let i=0;i<20;i++) {
-    setTimeout(createStar, i * 200);
-  }
-  setInterval(createStar, 3000);
-}
-
-setTimeout(showNextSlide, 1000);
+  nodes[i].classList.remove('active');
+  i = (i + 1);
+  nodes[i].classList.add('active');
+}, 5000);
 </script>
-
 </body>
 </html>
