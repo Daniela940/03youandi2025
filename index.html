@@ -161,6 +161,34 @@ body {
     height:6px;
   }
 }
+
+/* Butoane control */
+#controls {
+  position:absolute;
+  bottom:12px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:15px;
+  opacity:0;
+  transition: opacity 0.4s;
+  z-index:200;
+}
+#slide-container:hover #controls {
+  opacity:1;
+}
+.control-btn {
+  background:none;
+  border:none;
+  font-size:1.8rem;
+  color:rgba(0,120,255,0.7);
+  cursor:pointer;
+  padding:4px;
+}
+.control-btn:hover {
+  color:rgba(0,120,255,1);
+  transform:scale(1.1);
+}
 </style>
 </head>
 <body>
@@ -169,7 +197,14 @@ body {
   <source src="muzica.mp3" type="audio/mpeg">
 </audio>
 
-<div id="slide-container"></div>
+<div id="slide-container">
+  <!-- Butoane control -->
+  <div id="controls">
+    <button id="prev" class="control-btn">⏮</button>
+    <button id="pause" class="control-btn">⏯</button>
+    <button id="next" class="control-btn">⏭</button>
+  </div>
+</div>
 <div id="confetti-layer"></div>
 <div id="final-layer"></div>
 
@@ -223,20 +258,59 @@ slidesData.forEach(data => {
 // --- Animatie slide-uri ---
 const slides = document.querySelectorAll('.slide');
 let current = 0;
-function showNextSlide(){
-  if(current>0) slides[current-1].style.opacity=0;
-  if(current<slides.length){
+let isPaused = false;
+let slideTimer = null;
+
+function showSlide(index) {
+  slides.forEach((s,i) => s.style.opacity = (i===index ? 1 : 0));
+  current = index;
+}
+
+function showNextSlide(auto=true){
+  if(isPaused && auto) return;
+  if(current < slides.length - 1){
     const s = slides[current];
     const randX = (Math.random()*40 - 20);
     const fromLeft = Math.random()<0.5 ? -100 : 100;
     s.style.transform=`translateX(${fromLeft}px) rotate(${randX}deg)`;
-    setTimeout(()=>{ s.style.opacity=1; s.style.transform=`translateX(0px) rotate(0deg)` }, 50);
+    setTimeout(()=>{ 
+      showSlide(current);
+    }, 50);
     current++;
-    setTimeout(showNextSlide, 2000);
-  } else {
-    showFinal();
+    if(current < slides.length - 1){
+      slideTimer = setTimeout(()=>showNextSlide(true), 2000);
+    } else {
+      // acum trecem direct la final
+      setTimeout(showFinal, 2000);
+    }
   }
 }
+
+function showPrevSlide(){
+  clearTimeout(slideTimer);
+  if(current>1){
+    current -= 2;
+    showNextSlide(false);
+  }
+}
+
+function manualNext(){
+  clearTimeout(slideTimer);
+  showNextSlide(false);
+}
+
+// --- Butoane ---
+document.getElementById("prev").onclick = showPrevSlide;
+document.getElementById("next").onclick = manualNext;
+document.getElementById("pause").onclick = function(){
+  if(isPaused){
+    isPaused = false;
+    showNextSlide(true);
+  } else {
+    isPaused = true;
+    clearTimeout(slideTimer);
+  }
+};
 
 // --- Confetti ---
 for(let i=0;i<60;i++){
@@ -253,7 +327,6 @@ for(let i=0;i<60;i++){
 }
 
 // --- Baloane + Stele ---
-// animatie baloane
 const style = document.createElement('style');
 style.textContent = `
 @keyframes rise {
@@ -263,8 +336,7 @@ style.textContent = `
 }`;
 document.head.appendChild(style);
 
-function createBalloon() 
-{
+function createBalloon() {
   const b = document.createElement('div');
   b.className = 'balloon';
   b.style.left = (5 + Math.random() * 90) + '%';
@@ -279,8 +351,7 @@ function createBalloon()
   document.getElementById('final-layer').appendChild(b);
 }
 
-function createStar() 
-{
+function createStar() {
   const s = document.createElement('div');
   s.className = 'star';
   s.style.left = Math.random() * 100 + '%';
@@ -290,28 +361,29 @@ function createStar()
   document.getElementById('final-layer').appendChild(s);
 }
 
-function showFinal()
-{
-  // primul val de baloane
-  for(let i = 0; i < 15; i++)
-  {
+function showFinal() {
+  slides.forEach(s => s.style.opacity = 0);
+  slides[slides.length-1].style.opacity = 1; // ultimul slide rămâne pe fundal
+
+  for(let i = 0; i < 15; i++) {
     setTimeout(createBalloon, i * 300);
   }
-  // continuu
-  for(let i = 0; i < 15; i++)
-  {
+  for(let i = 0; i < 15; i++) {
     setInterval(createBalloon, 2000);
   }
-
-  // stele
-  for(let i=0;i<20;i++)
-  {
+  for(let i=0;i<20;i++) {
     setTimeout(createStar, i * 200);
   }
   setInterval(createStar, 3000);
 }
 
-setTimeout(showNextSlide, 1500);
+// afișează primul slide imediat
+showSlide(0);
+current = 1; // astfel următorul va fi slide-ul 2
+
+// pornește prezentarea după 2 secunde
+setTimeout(()=>showNextSlide(true), 2000);
+
 </script>
 
 </body>
