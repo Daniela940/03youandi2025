@@ -262,7 +262,7 @@ let current = 0;
 let isPaused = false;
 let slideTimer = null;
 
-function showSlide(index) {
+/*function showSlide(index) {
   slides.forEach((s,i) => s.style.opacity = (i===index ? 1 : 0));
   current = index;
 }
@@ -287,21 +287,6 @@ function showNextSlide(auto=true){
   }
 }
 
-/*function showPrevSlide() {
-  clearTimeout(slideTimer); // oprește temporizatorul automat
-  if(current > 0){
-    current--;             // mergem un slide înapoi
-    const s = slides[current];
-    const randX = (Math.random()*40 - 20);
-    const fromLeft = Math.random()<0.5 ? -100 : 100;
-    s.style.transform = `translateX(${fromLeft}px) rotate(${randX}deg)`;
-    setTimeout(() => {
-      slides.forEach((slide, i) => slide.style.opacity = (i===current ? 1 : 0));
-      s.style.transform = `translateX(0px) rotate(0deg)`;
-    }, 50);
-  }
-}*/
-
 function showPrevSlide() {
   // Oprim timer-ul temporar
   clearTimeout(slideTimer);
@@ -316,7 +301,44 @@ function showPrevSlide() {
       slide.style.transform = `translateX(0px) rotate(0deg)`;
     });
   }
+}*/
+
+// funcție care afișează slide-ul exact, fără rotație
+function showSlide(index){
+  slides.forEach((slide, i) => {
+    slide.style.opacity = (i === index ? 1 : 0);
+    slide.style.transform = `translateX(0px) rotate(0deg)`;
+  });
 }
+
+// NEXT
+function showNextSlide(auto=true){
+  if(isPaused && auto) return;
+  if(current < slides.length - 1){
+    const s = slides[current];
+    const randX = (Math.random()*40 - 20);
+    const fromLeft = Math.random()<0.5 ? -100 : 100;
+    s.style.transform=`translateX(${fromLeft}px) rotate(${randX}deg)`;
+    setTimeout(()=>{ showSlide(current); }, 50);
+
+    current++;
+    if(current < slides.length - 1){
+      slideTimer = setTimeout(()=>showNextSlide(true), 2000);
+    } else {
+      setTimeout(showFinal, 2000);
+    }
+  }
+}
+
+// PREV
+function showPrevSlide(){
+  clearTimeout(slideTimer); // oprește temporizatorul automat
+  if(current > 0){
+    current--; // mergem un slide înapoi
+    showSlide(current);
+  }
+}
+
 
 function manualNext(){
   clearTimeout(slideTimer);
