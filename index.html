@@ -287,21 +287,20 @@ function showNextSlide(auto=true){
   }
 }
 
-function showPrevSlide(){
-  clearTimeout(slideTimer);      // oprește timer-ul automat
-  if(current > 0){               // verificăm dacă nu suntem pe primul slide
-    current--;                   // mergem un slide înapoi
+function showPrevSlide() {
+  clearTimeout(slideTimer); // oprește temporizatorul automat
+  if(current > 0){
+    current--;             // mergem un slide înapoi
     const s = slides[current];
     const randX = (Math.random()*40 - 20);
     const fromLeft = Math.random()<0.5 ? -100 : 100;
-    s.style.transform=`translateX(${fromLeft}px) rotate(${randX}deg)`;
-    setTimeout(()=>{ 
-      showSlide(current);
+    s.style.transform = `translateX(${fromLeft}px) rotate(${randX}deg)`;
+    setTimeout(() => {
+      slides.forEach((slide, i) => slide.style.opacity = (i===current ? 1 : 0));
+      s.style.transform = `translateX(0px) rotate(0deg)`;
     }, 50);
   }
 }
-
-
 
 function manualNext(){
   clearTimeout(slideTimer);
