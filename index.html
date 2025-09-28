@@ -288,12 +288,20 @@ function showNextSlide(auto=true){
 }
 
 function showPrevSlide(){
-  clearTimeout(slideTimer);
-  if(current>1){
-    current --;
-    showSlide(current);
+  clearTimeout(slideTimer);      // oprește timer-ul automat
+  if(current > 0){               // verificăm dacă nu suntem pe primul slide
+    current--;                   // mergem un slide înapoi
+    const s = slides[current];
+    const randX = (Math.random()*40 - 20);
+    const fromLeft = Math.random()<0.5 ? -100 : 100;
+    s.style.transform=`translateX(${fromLeft}px) rotate(${randX}deg)`;
+    setTimeout(()=>{ 
+      showSlide(current);
+    }, 50);
   }
 }
+
+
 
 function manualNext(){
   clearTimeout(slideTimer);
