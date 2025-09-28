@@ -290,8 +290,8 @@ function showNextSlide(auto=true){
 function showPrevSlide(){
   clearTimeout(slideTimer);
   if(current>1){
-    current -= 2;
-    showNextSlide(false);
+    current --;
+    showSlide(current);
   }
 }
 
