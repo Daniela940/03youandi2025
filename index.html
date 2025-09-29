@@ -287,7 +287,7 @@ function showNextSlide(auto=true){
   }
 }
 
-function showPrevSlide() {
+/*function showPrevSlide() {
   // Oprim timer-ul temporar
   clearTimeout(slideTimer);
 
@@ -300,6 +300,15 @@ function showPrevSlide() {
       slide.style.opacity = (i === current ? 1 : 0);
       slide.style.transform = `translateX(0px) rotate(0deg)`;
     });
+  }
+}*/
+
+  function showPrevSlide() {
+  clearTimeout(slideTimer);
+
+  if (current > 0) {
+    current--;
+    showSlide(current);
   }
 }
 
@@ -389,7 +398,7 @@ function showFinal() {
 
 // afișează primul slide imediat
 showSlide(0);
-current = 1; // astfel următorul va fi slide-ul 2
+current = 0; // astfel următorul va fi slide-ul 2
 
 // pornește prezentarea după 2 secunde
 setTimeout(()=>showNextSlide(true), 5000);
