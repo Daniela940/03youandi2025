@@ -199,7 +199,6 @@ body {
 </audio>
 
 <div id="slide-container">
-  <!-- Butoane control -->
   <div id="controls">
     <button id="prev" class="control-btn">⏮</button>
     <button id="pause" class="control-btn">⏯</button>
@@ -210,6 +209,8 @@ body {
 <div id="final-layer"></div>
 
 <script>
+window.onload = function(){
+
 // --- Slide-uri ---
 const slidesData = [
   {img:"1.jpg", note:"Nu știam atunci când ne-am cunoscut că vei fi persoana care mă va schimba atât de mult, care mă va învăța să spun și să arăt ceea ce simt!"},
@@ -225,7 +226,7 @@ const slidesData = [
   {img:"11.jpg", note:"Simt că am câștigat o soră, nu doar o prietenă! Ești dovada vie că nu doar legăturile de sânge ne fac familie, ci si cele de suflet!"},
   {img:"12.jpg", note:"Ești prietena care mă ascultă, care mă înțelege (sau nu), care mi-a oferit sprijinul ce mi-a lipsit."}, 
   {img:"13.jpg", note:"Mă bucur că ne sprijinim una pe cealaltă când viața ne face să șchiopătăm!"},
-  {img:"14.jpg", note:"Alături de tine am învățat să spun "Te iubesc!" și să nu îmi fie frică să și arăt!"},
+  {img:"14.jpg", note:'Alături de tine am învățat să spun "Te iubesc!" și să nu îmi fie frică să și arăt!'},
   {img:"15.jpg", note:"Oare cât o să mă mai rabzi până să faci apel la bobârnace?"},
   {img:"16.jpg", note:"Cea mai mare fericire e să simți că cineva te iubește. Nu să știi, ci să simți!"}, 
   {img:"17.jpg", note:"Forever together!"},
@@ -238,7 +239,7 @@ const slidesData = [
   {img:"24.jpg", note:""}, 
   {img:"25.jpg", note:""},
   {img:"26.jpg", note:""},
-  {img:"27.jpg", note:"Veveriță împielițată"},
+  {img:"27.jpg", note:""},
   {img:"28.jpg", note:"Să găsești în fiecare zi un motiv pentru care să zâmbești! Să fii fericită mereu, prietena mea luptătoare!"}, 
   {img:"29.jpg", note:"La mulți, mulți ani în care să zâmbești! Sunt aici lângă tine mereu! Mă bucur că ești în viața mea!"},
 ];
@@ -263,43 +264,33 @@ let isPaused = false;
 let slideTimer = null;
 
 function showSlide(index) {
-  slides.forEach((s,i) => s.style.opacity = (i===index ? 1 : 0));
-  current = index;
+  slides.forEach((s,i) => {
+    s.style.opacity = (i===index ? 1 : 0);
+    s.style.transform = `translateX(0px) rotate(0deg)`;
+  });
 }
 
 function showNextSlide(auto=true){
   if(isPaused && auto) return;
-  if(current < slides.length - 1){
-    const s = slides[current];
-    const randX = (Math.random()*40 - 20);
-    const fromLeft = Math.random()<0.5 ? -100 : 100;
-    s.style.transform=`translateX(${fromLeft}px) rotate(${randX}deg)`;
-    setTimeout(()=>{ 
-      showSlide(current);
-    }, 50);
+  if(current < slides.length){
+    showSlide(current);
     current++;
-    if(current < slides.length - 1){
+    if(current < slides.length){
       slideTimer = setTimeout(()=>showNextSlide(true), 2000);
     } else {
-      // acum trecem direct la final
       setTimeout(showFinal, 2000);
     }
   }
 }
 
 function showPrevSlide() {
-  // Oprim timer-ul temporar
   clearTimeout(slideTimer);
-
-  // Dacă nu suntem pe primul slide
-  if(current > 0){
-    current--; // mergem un slide înapoi
-
-    // afișăm slide-ul curent exact ca la început (fără rotație)
-    slides.forEach((slide, i) => {
-      slide.style.opacity = (i === current ? 1 : 0);
-      slide.style.transform = `translateX(0px) rotate(0deg)`;
-    });
+  if(current > 1){
+    current -= 2;
+    showNextSlide(false);
+  } else {
+    showSlide(0);
+    current = 1;
   }
 }
 
@@ -372,7 +363,7 @@ function createStar() {
 
 function showFinal() {
   slides.forEach(s => s.style.opacity = 0);
-  slides[slides.length-1].style.opacity = 1; // ultimul slide rămâne pe fundal
+  slides[slides.length-1].style.opacity = 1;
 
   for(let i = 0; i < 15; i++) {
     setTimeout(createBalloon, i * 300);
@@ -388,11 +379,12 @@ function showFinal() {
 
 // afișează primul slide imediat
 showSlide(0);
-current = 0; // astfel următorul va fi slide-ul 2
+current = 1;
 
-// pornește prezentarea după 2 secunde
+// pornește prezentarea după 5 secunde
 setTimeout(()=>showNextSlide(true), 5000);
 
+}; // end window.onload
 </script>
 
 </body>
