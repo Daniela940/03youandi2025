@@ -273,7 +273,7 @@ function showNextSlide(auto=true){
     showSlide(current);
     current++;
     if(current < slides.length){
-      slideTimer = setTimeout(()=>showNextSlide(true), 2000);
+      slideTimer = setTimeout(()=>showNextSlide(true), 5000);
     } else {
       setTimeout(showFinal, 2000);
     }
